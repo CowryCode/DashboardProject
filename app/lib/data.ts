@@ -1,11 +1,7 @@
 import { sql } from '@vercel/postgres';
 import {
-  CustomerField,
   CustomersTableType,
   InvoiceForm,
-  InvoicesTable,
-  LatestInvoiceRaw,
-  Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
 
@@ -145,31 +141,156 @@ export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
 ) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
+ // const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+   console.log(query)
+   console.log(currentPage)
   try {
-    const invoices = await sql<InvoicesTable>`
-      SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `;
+    // const invoices = await sql<InvoicesTable>`
+    //   SELECT
+    //     invoices.id,
+    //     invoices.amount,
+    //     invoices.date,
+    //     invoices.status,
+    //     customers.name,
+    //     customers.email,
+    //     customers.image_url
+    //   FROM invoices
+    //   JOIN customers ON invoices.customer_id = customers.id
+    //   WHERE
+    //     customers.name ILIKE ${`%${query}%`} OR
+    //     customers.email ILIKE ${`%${query}%`} OR
+    //     invoices.amount::text ILIKE ${`%${query}%`} OR
+    //     invoices.date::text ILIKE ${`%${query}%`} OR
+    //     invoices.status ILIKE ${`%${query}%`}
+    //   ORDER BY invoices.date DESC
+    //   LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    // `;
+    //return invoices.rows;
 
-    return invoices.rows;
+    // MY CODE TO SIMULATE API CALL 
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const queryResponse = [
+      {
+        id: "1",
+        amount: "250.75",
+        date: "2025-01-15",
+        status: "Paid",
+        name: "John Doe",
+        email: "john.doe@example.com",
+        image_url: "/customers/amy-burns.png",
+      },
+      {
+        id: "2",
+        amount: "120.50",
+        date: "2025-01-10",
+        status: "Pending",
+        name: "Jane Smith",
+        email: "jane.smith@example.com",
+        image_url: "/customers/balazs-orban.png",
+      },
+      {
+        id: "3",
+        amount: "310.00",
+        date: "2025-01-08",
+        status: "Overdue",
+        name: "Michael Brown",
+        email: "michael.brown@example.com",
+        image_url: "/customers/delba-de-oliveira.png",
+      },
+      {
+        id: "4",
+        amount: "85.99",
+        date: "2025-01-05",
+        status: "Paid",
+        name: "Emily White",
+        email: "emily.white@example.com",
+        image_url: "/customers/evil-rabbit.png",
+      },
+      {
+        id: "5",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/lee-robinson.png",
+      },
+      {
+        id: "6",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/michael-novotny.png",
+      },
+      {
+        id: "7",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/michael-novotny.png",
+      },
+      {
+        id: "8",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/michael-novotny.png",
+      },
+      {
+        id: "9",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/michael-novotny.png",
+      },
+      {
+        id: "10",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/michael-novotny.png",
+      },
+      {
+        id: "11",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/michael-novotny.png",
+      },
+      {
+        id: "12",
+        amount: "450.00",
+        date: "2025-01-02",
+        status: "Pending",
+        name: "David Johnson",
+        email: "david.johnson@example.com",
+        image_url: "/customers/michael-novotny.png",
+      },
+    ];
+
+    const invoicesTable = queryResponse.map((invoice, index) => ({
+      id: String(invoice.id),
+      customer_id: `CUST00${index + 1}`, 
+      name: String(invoice.name),
+      email: String(invoice.email),
+      image_url: String(invoice.image_url),
+      date: String(invoice.date),
+      amount: parseFloat(invoice.amount), 
+      status: invoice.status.toLowerCase() === "paid" ? "paid" : "pending", 
+    }))
+    return invoicesTable;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoices.');
@@ -188,7 +309,6 @@ export async function fetchInvoicesPages(query: string) {
       invoices.date::text ILIKE ${`%${query}%`} OR
       invoices.status ILIKE ${`%${query}%`}
   `;
-
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
@@ -199,23 +319,60 @@ export async function fetchInvoicesPages(query: string) {
 
 export async function fetchInvoiceById(id: string) {
   try {
-    const data = await sql<InvoiceForm>`
-      SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
-    `;
+    // const data = await sql<InvoiceForm>`
+    //   SELECT
+    //     invoices.id,
+    //     invoices.customer_id,
+    //     invoices.amount,
+    //     invoices.status
+    //   FROM invoices
+    //   WHERE invoices.id = ${id};
+    // `;
 
-    const invoice = data.rows.map((invoice) => ({
-      ...invoice,
-      // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
-    }));
+    // const invoice = data.rows.map((invoice) => ({
+    //   ...invoice,
+    //   // Convert amount from cents to dollars
+    //   amount: invoice.amount / 100,
+    // }));
+    //return invoice[0];
 
-    return invoice[0];
+    console.log(id)
+
+    const sampleInvoiceForms: InvoiceForm[] = [
+      {
+        id: "1",
+        customer_id: "CUST001",
+        amount: 250.75,
+        status: "paid",
+      },
+      {
+        id: "2",
+        customer_id: "CUST002",
+        amount: 120.5,
+        status: "pending",
+      },
+      {
+        id: "3",
+        customer_id: "CUST003",
+        amount: 310.0,
+        status: "paid",
+      },
+      {
+        id: "4",
+        customer_id: "CUST004",
+        amount: 85.99,
+        status: "pending",
+      },
+      {
+        id: "5",
+        customer_id: "CUST005",
+        amount: 450.0,
+        status: "paid",
+      },
+    ];
+    const firstInvoice = sampleInvoiceForms[3];
+    return firstInvoice;
+
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
@@ -224,16 +381,31 @@ export async function fetchInvoiceById(id: string) {
 
 export async function fetchCustomers() {
   try {
-    const data = await sql<CustomerField>`
-      SELECT
-        id,
-        name
-      FROM customers
-      ORDER BY name ASC
-    `;
+    // const data = await sql<CustomerField>`
+    //   SELECT
+    //     id,
+    //     name
+    //   FROM customers
+    //   ORDER BY name ASC
+    // `;
+    // const customers = data.rows;
+    // return customers;
 
-    const customers = data.rows;
+    const queryResponse = [
+      { id: "CUST001", name: "Alice Brown" },
+      { id: "CUST002", name: "Bob Smith" },
+      { id: "CUST003", name: "Charlie Johnson" },
+      { id: "CUST004", name: "Diana White" },
+      { id: "CUST005", name: "Ethan Davis" },
+    ];
+
+    const customers = queryResponse.map((customer) => ({
+      id: String(customer.id), 
+      name: String(customer.name), 
+    }));
+    
     return customers;
+
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch all customers.');
